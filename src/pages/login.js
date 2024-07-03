@@ -50,9 +50,6 @@ const Login = () => {
     }
   };
 
-
-
-
   const handleLogout = () => {
     setNomeUsuario('');
     setSenha('');

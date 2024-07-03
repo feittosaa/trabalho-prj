@@ -37,7 +37,7 @@ const UserForm = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        {isAdmin === true && (
+        {isAdmin && (
           <Select
             value={profile}
             onChange={(e) => setProfile(e.target.value)}

@@ -1,17 +1,20 @@
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter, Route, Routes, Link, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Admin from './pages/admin';
+import AlbumEditor from './pages/albumEditor';
 import Login from './pages/login';
 import UserForm from './pages/userForm';
-import AlbumEditor from './pages/albumEditor';
+
+const isAdmin = JSON.parse(localStorage.getItem('admin')) === true;
+const isAdminAbsolute = JSON.parse(localStorage.getItem('adminAbsoluto')) === true;
 
 const PrivateRoute = ({ element, isAbsolute, ...rest }) => {
-  const isAdmin = JSON.parse(localStorage.getItem('admin')) === true;
-  const isAdminAbsolute = JSON.parse(localStorage.getItem('adminAbsoluto')) === true;
+  const isAdminRoute = JSON.parse(localStorage.getItem('admin')) === true;
+  const isAdminAbsoluteRoute = JSON.parse(localStorage.getItem('adminAbsoluto')) === true;
 
-  if (isAdminAbsolute || (isAdmin && !isAbsolute)) {
+  if (isAdminAbsoluteRoute || (isAdminRoute && !isAbsolute)) {
     return element;
   }
   return <Navigate to="/login" />;
@@ -21,9 +24,9 @@ const Header = () => {
   return (
     <HeaderContainer>
       <NavLink href="/login">Login</NavLink>
-      <NavLink href="/album-editor">Editar Álbum</NavLink>
-      <NavLink href="/admin">Admin</NavLink>
+      {isAdmin && <NavLink href="/album-editor">Editar Álbum</NavLink>}
       <NavLink href="/user-form">Formulário de Usuário</NavLink>
+      {isAdminAbsolute && <NavLink href="/admin">Admin</NavLink>}
     </HeaderContainer>
   );
 };
@@ -51,7 +54,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/album-editor" element={<PrivateRoute element={<AlbumEditor />} isAbsolute={false} />} />
           <Route path="/admin" element={<PrivateRoute element={<Admin />} isAbsolute={true} />} />
-          <Route path="/user-form" element={<PrivateRoute element={<UserForm />} isAbsolute={true} />} />
+          <Route path="/user-form" element={<PrivateRoute element={<UserForm />}/>} />
         </Routes>
       </AuthWrapper>
     </BrowserRouter>
