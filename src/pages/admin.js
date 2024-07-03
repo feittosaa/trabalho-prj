@@ -24,6 +24,8 @@ const Admin = () => {
   const [newUser, setNewUser] = useState('');
   const [filterText, setFilterText] = useState('');
 
+
+
   const handleAddUser = () => {
     if (newUser) {
       setUsers([...users, { nome: newUser, perfil: 'Desconhecido' }]);

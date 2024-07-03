@@ -1,51 +1,59 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Link, Navigate, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Admin from './pages/admin';
 import Login from './pages/login';
 import UserForm from './pages/userForm';
 import AlbumEditor from './pages/albumEditor';
 
-const PrivateRoute = ({ element, ...rest }) => {
+const PrivateRoute = ({ element, isAbsolute, ...rest }) => {
   const isAdmin = JSON.parse(localStorage.getItem('admin')) === true;
-  const isAdminAbsoluto = JSON.parse(localStorage.getItem('adminAbsoluto')) === true;
+  const isAdminAbsolute = JSON.parse(localStorage.getItem('adminAbsoluto')) === true;
 
-  // Verifica se o usuário é administrador absoluto
-  if (isAdminAbsoluto) {
+  if (isAdminAbsolute || (isAdmin && !isAbsolute)) {
     return element;
-  } else if (isAdmin) {
-    // Verifica se está tentando acessar /admin ou /user-form
-    if (rest.path === '/admin' || rest.path === '/user-form') {
-      return <Navigate to="/login" />;
-    } else {
-      return element;
-    }
-  } else {
-    return <Navigate to="/login" />;
   }
+  return <Navigate to="/login" />;
 };
 
 const Header = () => {
   return (
     <HeaderContainer>
-      <NavLink to="/album-editor">Editar Álbum</NavLink>
-      <NavLink to="/admin">Admin</NavLink>
-      <NavLink to="/user-form">Formulário de Usuário</NavLink>
+      <NavLink href="/login">Login</NavLink>
+      <NavLink href="/album-editor">Editar Álbum</NavLink>
+      <NavLink href="/admin">Admin</NavLink>
+      <NavLink href="/user-form">Formulário de Usuário</NavLink>
     </HeaderContainer>
   );
+};
+
+const AuthWrapper = ({ children }) => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const isAdmin = JSON.parse(localStorage.getItem('admin')) === true;
+    if (!isAdmin) {
+      navigate('/login');
+    }
+  }, [navigate]);
+
+  return children;
 };
 
 const App = () => {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/album-editor" element={<PrivateRoute element={<AlbumEditor />} />} />
-        <Route path="/admin" element={<PrivateRoute element={<Admin />} />} />
-        <Route path="/user-form" element={<PrivateRoute element={<UserForm />} />} />
-      </Routes>
+      <AuthWrapper>
+        <Header />
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/album-editor" element={<PrivateRoute element={<AlbumEditor />} isAbsolute={false} />} />
+          <Route path="/admin" element={<PrivateRoute element={<Admin />} isAbsolute={true} />} />
+          <Route path="/user-form" element={<PrivateRoute element={<UserForm />} isAbsolute={true} />} />
+        </Routes>
+      </AuthWrapper>
     </BrowserRouter>
   );
 };
@@ -59,7 +67,7 @@ const HeaderContainer = styled.header`
   padding: 10px 0;
 `;
 
-const NavLink = styled(Link)`
+const NavLink = styled.a`
   text-decoration: none;
   color: white;
   padding: 10px;
