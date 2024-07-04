@@ -7,6 +7,7 @@ import Admin from './pages/admin';
 import AlbumEditor from './pages/albumEditor';
 import Login from './pages/login';
 import UserForm from './pages/userForm';
+import StickerEditor from './pages/stickerEditor';
 
 const isAdmin = JSON.parse(localStorage.getItem('admin')) === true;
 const isAdminAbsolute = JSON.parse(localStorage.getItem('adminAbsoluto')) === true;
@@ -73,6 +74,7 @@ const App = () => {
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/user-form" element={<PrivateRoute element={<UserForm />} />} />
+          <Route path="/sticker-editor" element={<PrivateRoute element={<StickerEditor />} />} />
           <Route path="/album-editor" element={<PrivateRoute element={<AlbumEditor />} isAbsolute={false} />} />
           <Route path="/admin" element={<PrivateRoute element={<Admin />} isAbsolute={true} />} />
         </Routes>
