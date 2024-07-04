@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import ReactDOM from 'react-dom/client';
+import ReactDOM from 'react-dom';
 import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Splash from './components/splash/splash';
@@ -9,45 +9,60 @@ import Login from './pages/login';
 import UserForm from './pages/userForm';
 import StickerEditor from './pages/stickerEditor';
 
-const isAdmin = JSON.parse(localStorage.getItem('admin')) === true;
-const isAdminAbsolute = JSON.parse(localStorage.getItem('adminAbsoluto')) === true;
+const userRoles = {
+  COLLECTOR: 'COLLECTOR',
+  ADMIN: 'ADMIN',
+  AUTHOR: 'AUTHOR',
+};
 
-const PrivateRoute = ({ element, isAbsolute, ...rest }) => {
-  const isAdminRoute = JSON.parse(localStorage.getItem('admin')) === true;
-  const isAdminAbsoluteRoute = JSON.parse(localStorage.getItem('adminAbsoluto')) === true;
+const getUserRole = () => {
+  const role = localStorage.getItem('role');
+  return role;
+};
 
-  if (isAdminAbsoluteRoute || (isAdminRoute && !isAbsolute)) {
-    return element;
-  }
-  return <Navigate to="/login" />;
+const PrivateRoute = ({ element, allowedRoles }) => {
+  const navigate = useNavigate();
+  const userRole = getUserRole();
+
+  useEffect(() => {
+    if (!allowedRoles.includes(userRole)) {
+      navigate('/login');
+    }
+  }, [navigate, allowedRoles, userRole]);
+
+  return allowedRoles.includes(userRole) ? element : <Navigate to="/login" />;
 };
 
 const Header = () => {
+  const userRole = getUserRole();
+
   return (
     <HeaderContainer>
       <NavLink href="/login">Login</NavLink>
-      {isAdmin && <NavLink href="/album-editor">Editar Álbum</NavLink>}
       <NavLink href="/user-form">Formulário de Usuário</NavLink>
-      {isAdminAbsolute && <NavLink href="/admin">Admin</NavLink>}
+      {userRole === userRoles.AUTHOR && <NavLink href="/album-editor">Editar Álbum</NavLink>}
+      {userRole === userRoles.ADMIN && <NavLink href="/admin">Admin</NavLink>}
+      {userRole === userRoles.AUTHOR && <NavLink href="/sticker-editor">Editor de Adesivos</NavLink>}
     </HeaderContainer>
   );
 };
 
 const AuthWrapper = ({ children }) => {
   const navigate = useNavigate();
+  const userRole = getUserRole();
 
   useEffect(() => {
-    const isAdmin = JSON.parse(localStorage.getItem('admin')) === true;
-    if (!isAdmin) {
+    if (!userRole) {
       navigate('/login');
     }
-  }, [navigate]);
+  }, [navigate, userRole]);
 
-  return children;
+  return <>{children}</>;
 };
 
 const App = () => {
-/*
+
+  /*
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -55,7 +70,7 @@ const App = () => {
       setLoading(false);
     }, 2000);
 
-    return () => timer;
+    return () => clearTimeout(timer);
   }, []);
 
   if (loading) {
@@ -65,7 +80,9 @@ const App = () => {
       </LoadingScreen>
     );
   }
-*/
+
+  */
+
   return (
     <BrowserRouter>
       <AuthWrapper>
@@ -73,10 +90,10 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/user-form" element={<PrivateRoute element={<UserForm />} />} />
-          <Route path="/sticker-editor" element={<PrivateRoute element={<StickerEditor />} />} />
-          <Route path="/album-editor" element={<PrivateRoute element={<AlbumEditor />} isAbsolute={false} />} />
-          <Route path="/admin" element={<PrivateRoute element={<Admin />} isAbsolute={true} />} />
+          <Route path="/user-form" element={<UserForm />} />
+          <Route path="/sticker-editor" element={<PrivateRoute element={<StickerEditor />} allowedRoles={[userRoles.AUTHOR]} />} />
+          <Route path="/album-editor" element={<PrivateRoute element={<AlbumEditor />} allowedRoles={[userRoles.AUTHOR]} />} />
+          <Route path="/admin" element={<PrivateRoute element={<Admin />} allowedRoles={[userRoles.ADMIN]} />} />
         </Routes>
       </AuthWrapper>
     </BrowserRouter>

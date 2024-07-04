@@ -6,7 +6,7 @@ const UserForm = () => {
   const [password, setPassword] = useState('');
   const [profile, setProfile] = useState('Colecionador');
 
-  const isAdmin = localStorage.getItem('adminAbsoluto')
+  const isAdmin = localStorage.getItem('role') === 'ADMIN'
 
   const handleSubmit = () => {
     console.log('Usuário:', username);

@@ -24,26 +24,35 @@ const Login = () => {
   const [senha, setSenha] = useState('');
 
   const handleLogin = () => {
-    const user = mockUsers.find(
+    const collector = mockUsers.find(
       user =>
         user.nome.toLowerCase() === nomeUsuario.toLowerCase() &&
-        user.senha === senha
+        user.senha === senha &&
+        user.perfil == 'Colecionador'
     );
 
-    const userAbsoluto = mockUsers.find(
+    const admin = mockUsers.find(
       user =>
         user.nome.toLowerCase() === nomeUsuario.toLowerCase() &&
         user.senha === senha &&
         user.perfil == 'Administrador'
     );
 
-    if (userAbsoluto) {
-      localStorage.setItem('adminAbsoluto', JSON.stringify(true));
-      localStorage.setItem('admin', JSON.stringify(true));
+    const author = mockUsers.find(
+      user =>
+        user.nome.toLowerCase() === nomeUsuario.toLowerCase() &&
+        user.senha === senha &&
+        user.perfil == 'Autor'
+    );
+
+    if (admin) {
+      localStorage.setItem('role', 'ADMIN');
       window.location.href = '/admin';
-    } else if (user) {
-      localStorage.setItem('adminAbsoluto', JSON.stringify(false));
-      localStorage.setItem('admin', JSON.stringify(true));
+    } else if (collector) {
+      localStorage.setItem('role', 'COLLECTOR');
+      window.location.href = '/sticker-editor';
+    } else if (author) {
+      localStorage.setItem('role', 'AUTHOR');
       window.location.href = '/album-editor';
     } else {
       alert('Credenciais inválidas. Tente novamente.');
@@ -53,8 +62,7 @@ const Login = () => {
   const handleLogout = () => {
     setNomeUsuario('');
     setSenha('');
-    localStorage.setItem('admin', JSON.stringify(false));
-    localStorage.setItem('adminAbsoluto', JSON.stringify(false));
+    localStorage.setItem('role', JSON.stringify(''));
     console.log('Desconectado');
   };
 

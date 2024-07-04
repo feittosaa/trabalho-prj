@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import md5 from 'md5';
 import styled from 'styled-components';
 
-const StickerEditor = ({ isAuthor }) => {
+const StickerEditor = () => {
   const [name, setName] = useState('');
   const [page, setPage] = useState('');
   const [coverImage, setCoverImage] = useState(null);
   const [tag, setTag] = useState('');
   const [description, setDescription] = useState('');
+
+  const isAuthor = localStorage.getItem('role') === 'AUTHOR'
 
   const handleCoverUpload = async (event) => {
     const file = event.target.files[0];
