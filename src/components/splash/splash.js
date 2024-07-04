@@ -1,7 +1,7 @@
 import React from 'react'
 import './splash.css'
 
-function splash() {
+export default function Splash() {
   return (
     <div aria-label="Orange and tan hamster running in a metal wheel" role="img" class="wheel-and-hamster">
       <div class="wheel"></div>
@@ -23,5 +23,3 @@ function splash() {
     </div>
   )
 }
-
-export default splash

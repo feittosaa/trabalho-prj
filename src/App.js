@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
-import ReactDOM from 'react-dom';
+import React, { useEffect, useState } from 'react';
+import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import Splash from './components/splash/splash';
 import Admin from './pages/admin';
 import AlbumEditor from './pages/albumEditor';
 import Login from './pages/login';
@@ -45,6 +46,25 @@ const AuthWrapper = ({ children }) => {
 };
 
 const App = () => {
+/*
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
+    return () => timer;
+  }, []);
+
+  if (loading) {
+    return (
+      <LoadingScreen>
+        <Splash />
+      </LoadingScreen>
+    );
+  }
+*/
   return (
     <BrowserRouter>
       <AuthWrapper>
@@ -52,14 +72,23 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/user-form" element={<PrivateRoute element={<UserForm />} />} />
           <Route path="/album-editor" element={<PrivateRoute element={<AlbumEditor />} isAbsolute={false} />} />
           <Route path="/admin" element={<PrivateRoute element={<Admin />} isAbsolute={true} />} />
-          <Route path="/user-form" element={<PrivateRoute element={<UserForm />}/>} />
         </Routes>
       </AuthWrapper>
     </BrowserRouter>
   );
 };
+
+const LoadingScreen = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 24px;
+  font-weight: bold;
+`;
 
 const HeaderContainer = styled.header`
   display: flex;
