@@ -20,7 +20,7 @@ const mockUsers = [
 ];
 
 const Login = () => {
-  const [nomeUsuario, setNomeUsuario] = useState('');
+  const [nomeUsuario, setNomeUsuario] = useState(localStorage.getItem('name'));
   const [senha, setSenha] = useState('');
 
   const handleLogin = () => {
@@ -47,13 +47,16 @@ const Login = () => {
 
     if (admin) {
       localStorage.setItem('role', 'ADMIN');
+      localStorage.setItem('name', admin.nome);
       window.location.href = '/admin';
     } else if (collector) {
       localStorage.setItem('role', 'COLLECTOR');
       window.location.href = '/sticker-editor';
+      localStorage.setItem('name', collector.nome);
     } else if (author) {
       localStorage.setItem('role', 'AUTHOR');
       window.location.href = '/album-editor';
+      localStorage.setItem('name', author.nome);
     } else {
       alert('Credenciais inválidas. Tente novamente.');
     }
@@ -62,8 +65,10 @@ const Login = () => {
   const handleLogout = () => {
     setNomeUsuario('');
     setSenha('');
-    localStorage.setItem('role', JSON.stringify(''));
+    localStorage.setItem('role', '');
+    localStorage.setItem('name', '');
     console.log('Desconectado');
+    window.location.reload();
   };
 
   return (
