@@ -68,8 +68,8 @@ const Login = () => {
 
   return (
     <Container>
-      <Title>Login</Title>
       <InputContainer onSubmit={handleLogin}>
+        <Title>Login</Title>
         <Input
           type="text"
           placeholder="Usuário"
@@ -98,18 +98,21 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  height: 95vh;
   background-color: #f5f5f5;
 `;
 
 const Title = styled.h2`
-  margin-bottom: 20px;
   font-family: 'Roboto', sans-serif;
   color: #3f51b5;
 `;
 
 const InputContainer = styled.div`
-  margin-bottom: 20px;
+  margin-top: -18vh;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
 `;
 
 const Input = styled.input`

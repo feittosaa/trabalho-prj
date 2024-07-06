@@ -112,6 +112,7 @@ const LoadingScreen = styled.div`
 `;
 
 const HeaderContainer = styled.header`
+  height: 5vh;
   display: flex;
   justify-content: space-around;
   align-items: center;
