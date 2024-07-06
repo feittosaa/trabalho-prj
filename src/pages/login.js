@@ -1,48 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
-const mockUsers = [
-  { id: 1, nome: 'Coleman', perfil: 'Autor', senha: 'senha1' },
-  { id: 2, nome: 'Torry', perfil: 'Colecionador', senha: 'senha2' },
-  { id: 3, nome: 'Si', perfil: 'Colecionador', senha: 'senha3' },
-  { id: 4, nome: 'Joete', perfil: 'Administrador', senha: 'senha4' },
-  { id: 5, nome: 'Annice', perfil: 'Autor', senha: 'senha5' },
-  { id: 6, nome: 'Hendrik', perfil: 'Autor', senha: 'senha6' },
-  { id: 7, nome: 'Basilius', perfil: 'Administrador', senha: 'senha7' },
-  { id: 8, nome: 'Rochell', perfil: 'Administrador', senha: 'senha8' },
-  { id: 9, nome: 'Dylan', perfil: 'Autor', senha: 'senha9' },
-  { id: 10, nome: 'Adriena', perfil: 'Colecionador', senha: 'senha10' },
-  { id: 11, nome: 'Evelyn', perfil: 'Administrador', senha: 'senha11' },
-  { id: 12, nome: 'Reggie', perfil: 'Colecionador', senha: 'senha12' },
-  { id: 13, nome: 'Dexter', perfil: 'Administrador', senha: 'senha13' },
-  { id: 14, nome: 'Tammie', perfil: 'Colecionador', senha: 'senha14' },
-  { id: 15, nome: 'Vidovik', perfil: 'Administrador', senha: 'senha15' }
-];
-
 const Login = () => {
-  const [nomeUsuario, setNomeUsuario] = useState(localStorage.getItem('name'));
+  const [nomeUsuario, setNomeUsuario] = useState(localStorage.getItem('name') || '');
   const [senha, setSenha] = useState('');
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    // Fetch user data from your API endpoint
+    fetch('/api/users')
+      .then(response => response.json())
+      .then(data => {
+        setUsers(data); // Assuming data is an array of user objects
+      })
+      .catch(error => console.error('Error fetching user data:', error));
+  }, []);
 
   const handleLogin = () => {
-    const collector = mockUsers.find(
+    const collector = users.find(
       user =>
         user.nome.toLowerCase() === nomeUsuario.toLowerCase() &&
         user.senha === senha &&
-        user.perfil == 'Colecionador'
+        user.perfil === 'Colecionador'
     );
 
-    const admin = mockUsers.find(
+    const admin = users.find(
       user =>
         user.nome.toLowerCase() === nomeUsuario.toLowerCase() &&
         user.senha === senha &&
-        user.perfil == 'Administrador'
+        user.perfil === 'Administrador'
     );
 
-    const author = mockUsers.find(
+    const author = users.find(
       user =>
         user.nome.toLowerCase() === nomeUsuario.toLowerCase() &&
         user.senha === senha &&
-        user.perfil == 'Autor'
+        user.perfil === 'Autor'
     );
 
     if (admin) {
@@ -51,12 +44,12 @@ const Login = () => {
       window.location.href = '/admin';
     } else if (collector) {
       localStorage.setItem('role', 'COLLECTOR');
-      window.location.href = '/sticker-editor';
       localStorage.setItem('name', collector.nome);
+      window.location.href = '/sticker-editor';
     } else if (author) {
       localStorage.setItem('role', 'AUTHOR');
-      window.location.href = '/album-editor';
       localStorage.setItem('name', author.nome);
+      window.location.href = '/album-editor';
     } else {
       alert('Credenciais inválidas. Tente novamente.');
     }
@@ -112,7 +105,7 @@ const Title = styled.h2`
   color: #3f51b5;
 `;
 
-const InputContainer = styled.div`
+const InputContainer = styled.form`
   margin-top: -18vh;
   margin-bottom: 10px;
   display: flex;

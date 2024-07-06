@@ -1,12 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
 
 const UserForm = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [profile, setProfile] = useState('Colecionador');
+  const [users, setUsers] = useState([]);
 
-  const isAdmin = localStorage.getItem('role') === 'ADMIN'
+  // Fetch user data from API
+  useEffect(() => {
+    axios.get('http://localhost:8080/api/users')
+      .then(response => {
+        setUsers(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching users:', error);
+      });
+  }, []);
+
+  const isAdmin = localStorage.getItem('role') === 'ADMIN';
 
   const handleSubmit = () => {
     console.log('Usuário:', username);

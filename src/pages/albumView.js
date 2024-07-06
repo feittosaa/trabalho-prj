@@ -1,15 +1,26 @@
-// src/CollectorAlbumView.js
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { fetchAlbum } from '../API';
 
 const CollectorAlbumView = () => {
-
-  const albumData = []
-
+  const [albumData, setAlbumData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedSticker, setSelectedSticker] = useState(null);
 
   const stickersPerPage = 12; // Número de figurinhas por página, ajuste conforme necessário
+
+  useEffect(() => {
+    const fetchAlbumData = async () => {
+      try {
+        const album = await fetchAlbum();
+        setAlbumData(album.stickers); // Ajuste conforme a estrutura do seu álbum no backend
+      } catch (error) {
+        console.error('Erro ao carregar álbum:', error);
+      }
+    };
+
+    fetchAlbumData();
+  }, []);
 
   const handlePageChange = (direction) => {
     if (direction === 'prev' && currentPage > 1) {

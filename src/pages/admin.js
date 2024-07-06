@@ -1,30 +1,24 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { fetchAllUsers } from '../API';
 
 const Admin = () => {
-  const mockUsers = [
-    { id: 1, nome: 'Coleman', perfil: 'Autor', senha: 'senha1' },
-    { id: 2, nome: 'Torry', perfil: 'Colecionador', senha: 'senha2' },
-    { id: 3, nome: 'Si', perfil: 'Colecionador', senha: 'senha3' },
-    { id: 4, nome: 'Joete', perfil: 'Administrador', senha: 'senha4' },
-    { id: 5, nome: 'Annice', perfil: 'Autor', senha: 'senha5' },
-    { id: 6, nome: 'Hendrik', perfil: 'Autor', senha: 'senha6' },
-    { id: 7, nome: 'Basilius', perfil: 'Administrador', senha: 'senha7' },
-    { id: 8, nome: 'Rochell', perfil: 'Administrador', senha: 'senha8' },
-    { id: 9, nome: 'Dylan', perfil: 'Autor', senha: 'senha9' },
-    { id: 10, nome: 'Adriena', perfil: 'Colecionador', senha: 'senha10' },
-    { id: 11, nome: 'Evelyn', perfil: 'Administrador', senha: 'senha11' },
-    { id: 12, nome: 'Reggie', perfil: 'Colecionador', senha: 'senha12' },
-    { id: 13, nome: 'Dexter', perfil: 'Administrador', senha: 'senha13' },
-    { id: 14, nome: 'Tammie', perfil: 'Colecionador', senha: 'senha14' },
-    { id: 15, nome: 'Vidovik', perfil: 'Administrador', senha: 'senha15' }
-  ];
-
-  const [users, setUsers] = useState(mockUsers);
+  const [users, setUsers] = useState([]);
   const [newUser, setNewUser] = useState('');
   const [filterText, setFilterText] = useState('');
 
+  useEffect(() => {
+    const getUsers = async () => {
+      try {
+        const userData = await fetchAllUsers();
+        setUsers(userData);
+      } catch (error) {
+        console.error('Erro ao buscar usuários:', error);
+      }
+    };
 
+    getUsers();
+  }, []);
 
   const handleAddUser = () => {
     if (newUser) {
@@ -42,7 +36,7 @@ const Admin = () => {
     const editedProfile = prompt('Editar Perfil:', users[index].perfil);
     if (editedUser && editedProfile) {
       const updatedUsers = users.map((user, i) =>
-        (i === index ? { ...user, nome: editedUser, perfil: editedProfile } : user)
+        i === index ? { ...user, nome: editedUser, perfil: editedProfile } : user
       );
       setUsers(updatedUsers);
     }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import md5 from 'md5';
 import styled from 'styled-components';
+import { createSticker, updateSticker } from '../API';
 
 const StickerEditor = () => {
   const [name, setName] = useState('');
@@ -8,8 +9,10 @@ const StickerEditor = () => {
   const [coverImage, setCoverImage] = useState(null);
   const [tag, setTag] = useState('');
   const [description, setDescription] = useState('');
+  const [isNew, setIsNew] = useState(true); // Variável para determinar se é uma nova figurinha ou uma atualização
+  const [selectedSticker, setSelectedSticker] = useState(null); // Estado para armazenar a figurinha selecionada para edição
 
-  const isAuthor = localStorage.getItem('role') === 'AUTHOR'
+  const isAuthor = localStorage.getItem('role') === 'AUTHOR';
 
   const handleCoverUpload = async (event) => {
     const file = event.target.files[0];
@@ -39,6 +42,40 @@ const StickerEditor = () => {
       })();
     }
   }, [coverImage]);
+
+  const handleSaveSticker = async () => {
+    try {
+      const stickerData = {
+        sticker_image: coverImage,
+        sticker_json: {
+          name,
+          page,
+          tag,
+          description,
+        },
+      };
+
+      if (isAuthor) {
+        if (isNew) {
+          // Criação de nova figurinha
+          const sticker = await createSticker(stickerData);
+          console.log('Figurinha criada com sucesso:', sticker);
+          // Lógica para sucesso
+        } else {
+          // Atualização de figurinha existente
+          const sticker = await updateSticker(selectedSticker.id, stickerData);
+          console.log('Figurinha atualizada com sucesso:', sticker);
+          // Lógica para sucesso
+        }
+      } else {
+        console.error('Você não tem permissão para salvar figurinhas.');
+        // Lógica para permissão negada
+      }
+    } catch (error) {
+      console.error('Erro ao salvar figurinha:', error);
+      // Lógica para tratamento de erro
+    }
+  };
 
   return (
     <Container>
@@ -96,6 +133,11 @@ const StickerEditor = () => {
             disabled={!isAuthor}
           />
         </FormField>
+        {isAuthor && (
+          <Button onClick={handleSaveSticker}>
+            {isNew ? 'Salvar Figurinha' : 'Atualizar Figurinha'}
+          </Button>
+        )}
       </EditorSection>
       <PreviewSection>
         <h2>Preview</h2>
@@ -167,6 +209,19 @@ const ImagePreviewLarge = styled.img`
   width: 300px;
   height: 300px;
   margin-top: 10px;
+`;
+
+const Button = styled.button`
+  padding: 10px 20px;
+  background-color: #3f51b5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  &:hover {
+    background-color: #303f9f;
+  }
 `;
 
 export default StickerEditor;

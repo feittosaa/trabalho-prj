@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { updateAlbum } from '../API';
 
 const AlbumEditor = () => {
   const [albumName, setAlbumName] = useState('');
@@ -11,7 +12,7 @@ const AlbumEditor = () => {
 
   const handleCoverUpload = (event) => {
     const file = event.target.files[0];
-    setCoverImage(URL.createObjectURL(file));
+    setCoverImage(file);
   };
 
   const handleAddSticker = () => {
@@ -53,6 +54,23 @@ const AlbumEditor = () => {
     setPages(value === '' ? '' : parseInt(value)); // Converter para número ou manter vazio
   };
 
+  const handleSaveAlbum = async () => {
+    const albumData = {
+      name: albumName,
+      pages,
+      stickers
+    };
+
+    try {
+      const updatedAlbum = await updateAlbum(albumData, coverImage);
+      console.log('Álbum atualizado com sucesso:', updatedAlbum);
+      // Aqui você pode atualizar o estado ou fornecer feedback ao usuário conforme necessário
+    } catch (error) {
+      console.error('Erro ao atualizar álbum:', error);
+      alert('Erro ao atualizar álbum');
+    }
+  };
+
   const filteredStickers = stickers.filter(sticker =>
     sticker.name.includes(filterText)
   );
@@ -83,8 +101,9 @@ const AlbumEditor = () => {
               id="coverUpload"
             />
           </UploadButton>
-          {coverImage && <CoverImage src={coverImage} alt="Capa" />}
+          {coverImage && <CoverImage src={URL.createObjectURL(coverImage)} alt="Capa" />}
         </Row>
+        <Button onClick={handleSaveAlbum}>Salvar Álbum</Button>
       </Section>
       <Section>
         <h2>Figurinhas</h2>
