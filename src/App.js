@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import Splash from './components/splash/splash';
 import Admin from './pages/admin';
 import AlbumEditor from './pages/albumEditor';
+import CollectorAlbumView from './pages/albumView';
 import Login from './pages/login';
-import UserForm from './pages/userForm';
 import StickerEditor from './pages/stickerEditor';
+import UserForm from './pages/userForm';
 
 const userRoles = {
   COLLECTOR: 'COLLECTOR',
@@ -40,9 +40,10 @@ const Header = () => {
     <HeaderContainer>
       <NavLink href="/login">Login</NavLink>
       <NavLink href="/user-form">Formulário de Usuário</NavLink>
-      {userRole === userRoles.AUTHOR && <NavLink href="/album-editor">Editar Álbum</NavLink>}
-      {userRole === userRoles.ADMIN && <NavLink href="/admin">Admin</NavLink>}
       {userRole === userRoles.AUTHOR && <NavLink href="/sticker-editor">Editor de Adesivos</NavLink>}
+      {userRole === userRoles.AUTHOR && <NavLink href="/album-editor">Editar Álbum</NavLink>}
+      {userRole === userRoles.COLLECTOR && <NavLink href="/album-view">Ver Coleção</NavLink>}
+      {userRole === userRoles.ADMIN && <NavLink href="/admin">Admin</NavLink>}
     </HeaderContainer>
   );
 };
@@ -93,6 +94,7 @@ const App = () => {
           <Route path="/user-form" element={<UserForm />} />
           <Route path="/sticker-editor" element={<PrivateRoute element={<StickerEditor />} allowedRoles={[userRoles.AUTHOR]} />} />
           <Route path="/album-editor" element={<PrivateRoute element={<AlbumEditor />} allowedRoles={[userRoles.AUTHOR]} />} />
+          <Route path="/album-view" element={<PrivateRoute element={<CollectorAlbumView />} allowedRoles={[userRoles.COLLECTOR]} />} />
           <Route path="/admin" element={<PrivateRoute element={<Admin />} allowedRoles={[userRoles.ADMIN]} />} />
         </Routes>
       </AuthWrapper>
