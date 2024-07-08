@@ -1,14 +1,25 @@
+// src/CollectorAlbumView.js
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { fetchAlbum, fetchStickers } from "../API";
+import AdicionarFigurinha from "../components/modalAdicionarFigurinha/adicionarFigurinha";
 
 const CollectorAlbumView = () => {
     const [albumData, setAlbumData] = useState([]);
     const [albumInfo, setAlbumInfo] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedSticker, setSelectedSticker] = useState(null);
-
+    const [isModalOpen, setModalOpen] = useState(false);
     const [firstTime, setFirstTime] = useState(true);
+
+    const openModal = () => {
+        setModalOpen(true);
+        console.log("modal aberto");
+    };
+
+    const closeModal = () => {
+        setModalOpen(false);
+    };
 
     const stickersPerPage = 1; // Número de figurinhas por página, ajuste conforme necessário
 
@@ -64,53 +75,46 @@ const CollectorAlbumView = () => {
         <Container>
             <Header>
                 <Button href="/user-form">Trocar Senha</Button>
-                <Button href="/sticker-editor">Adquirir Nova Figurinha</Button>
-                <Button href="">Sobre</Button>
+                <Button as="button" onClick={openModal}>Adquirir Nova Figurinha</Button>
+                <Button href="#">Sobre</Button>
             </Header>
+            <AdicionarFigurinha isOpen={isModalOpen} onClose={closeModal} />
             {firstTime ? (
-                <>
-                    <AlbumCover>
-                        <h2>Capa do Álbum</h2>
-                        <img
-                            style={{ height: "80%", width: "100%" }}
-                            src={`http://localhost:8080/api/image/${albumInfo.albumMd5}`}
-                            alt="Album Image"
-                        />
-                    </AlbumCover>
-                </>
+                <AlbumCover>
+                    <h2>Capa do Álbum</h2>
+                    <img
+                        style={{ height: "80%", width: "100%" }}
+                        src={`http://localhost:8080/api/image/${albumInfo.albumMd5}`}
+                        alt="Album Image"
+                    />
+                </AlbumCover>
             ) : (
-                <>
-                    <StickerGrid>
-                        {displayedStickers.map((sticker, index) => (
-                            <StickerItem
-                                key={index}
-                                onDoubleClick={() =>
-                                    handleStickerClick(sticker)
-                                }
-                            >
-                                {sticker.collected = true && (
-                                    <img
-                                        style={{ height: "80%", width: "100%" }}
-                                        src={`http://localhost:8080/api/image/${sticker.tag}`}
-                                        alt="Album Image"
-                                    />
-                                )}
-
-                                <StickerInfo>
-                                    <span>{sticker.number}</span>
-                                    <span>{sticker.name}</span>
-                                </StickerInfo>
-                            </StickerItem>
-                        ))}
-                    </StickerGrid>
-                </>
+                <StickerGrid>
+                    {displayedStickers.map((sticker, index) => (
+                        <StickerItem
+                            key={index}
+                            onDoubleClick={() => handleStickerClick(sticker)}
+                        >
+                            {sticker.collected && (
+                                <img
+                                    style={{ height: "80%", width: "100%" }}
+                                    src={`http://localhost:8080/api/image/${sticker.tag}`}
+                                    alt={sticker.name}
+                                />
+                            )}
+                            <StickerInfo>
+                                <span>{sticker.number}</span>
+                                <span>{sticker.name}</span>
+                            </StickerInfo>
+                        </StickerItem>
+                    ))}
+                </StickerGrid>
             )}
-
             <PaginationControls>
-                <Button onClick={() => handlePageChange("prev")}>
+                <Button as="button" onClick={() => handlePageChange("prev")}>
                     Página Anterior
                 </Button>
-                <Button onClick={() => handlePageChange("next")}>
+                <Button as="button" onClick={() => handlePageChange("next")}>
                     Próxima Página
                 </Button>
             </PaginationControls>
