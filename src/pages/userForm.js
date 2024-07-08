@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
+import { editUser, fetchAllUsers, getSpecifiedUser } from '../API';
 
 const UserForm = () => {
   const [username, setUsername] = useState('');
@@ -10,21 +11,24 @@ const UserForm = () => {
 
   // Fetch user data from API
   useEffect(() => {
-    axios.get('http://localhost:8080/api/users')
-      .then(response => {
-        setUsers(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching users:', error);
-      });
+    getUserInfo()
   }, []);
+
+  const getUserInfo = async () => {
+    const response = await getSpecifiedUser()
+    setUsername(response.userName)
+
+  }
 
   const isAdmin = localStorage.getItem('role') === 'ADMIN';
 
-  const handleSubmit = () => {
-    console.log('Usuário:', username);
-    console.log('Senha:', password);
-    console.log('Perfil:', profile);
+  const handleSubmit = async () => {
+    await editUser({
+      fullName: "",
+      userName: username,
+      password: "",
+      role: "",
+  },localStorage.getItem('id') )
   };
 
   const handleCancel = () => {
@@ -43,12 +47,6 @@ const UserForm = () => {
           placeholder="Usuário"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-        />
-        <Input
-          type="password"
-          placeholder="Senha"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
         />
         {isAdmin && (
           <Select

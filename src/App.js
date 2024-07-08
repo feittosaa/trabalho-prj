@@ -38,14 +38,23 @@ const Header = () => {
 
   return (
     <HeaderContainer>
-      <NavLink href="/login">Login</NavLink>
-      <NavLink href="/user-form">Formulário de Usuário</NavLink>
+     
+      {!userRole && <NavLink href="/login">Login</NavLink>}
+      {userRole && <NavLink href="/user-form">Formulário de Usuário</NavLink>}
       {userRole === userRoles.AUTHOR && <NavLink href="/sticker-editor">Editor de Adesivos</NavLink>}
       {userRole === userRoles.AUTHOR && <NavLink href="/album-editor">Editar Álbum</NavLink>}
       {userRole === userRoles.COLLECTOR && <NavLink href="/album-view">Ver Coleção</NavLink>}
       {userRole === userRoles.ADMIN && <NavLink href="/admin">Admin</NavLink>}
+      {userRole && <NavLink href='/' onClick={handleLogout}>Sair</NavLink>}
     </HeaderContainer>
   );
+};
+
+const handleLogout = () => {
+  localStorage.setItem('role', '');
+  localStorage.setItem('name', '');
+  console.log('Desconectado');
+  window.location.reload();
 };
 
 const AuthWrapper = ({ children }) => {
@@ -130,8 +139,5 @@ const NavLink = styled.a`
     background-color: #303f9f;
   }
 `;
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App />);
 
 export default App;

@@ -1,63 +1,65 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import api from '../API';
+import { jwtDecode } from 'jwt-decode';
 
 const Login = () => {
-  const [nomeUsuario, setNomeUsuario] = useState(localStorage.getItem('name') || '');
-  const [senha, setSenha] = useState('');
-  const [users, setUsers] = useState([]);
+  const [username, setUsername] = useState(localStorage.getItem('name') || '');
+  const [password, setPassword] = useState('');
 
   useEffect(() => {
-    // Fetch user data from your API endpoint
-    fetch('/api/users')
-      .then(response => response.json())
-      .then(data => {
-        setUsers(data); // Assuming data is an array of user objects
-      })
-      .catch(error => console.error('Error fetching user data:', error));
+
   }, []);
 
-  const handleLogin = () => {
-    const collector = users.find(
-      user =>
-        user.nome.toLowerCase() === nomeUsuario.toLowerCase() &&
-        user.senha === senha &&
-        user.perfil === 'Colecionador'
-    );
+  const handleLogin = async () => {
+    try {
+      const bodyLogin = {
+        username: username,
+        password: password
+      }
+      const response = await api.post('/auth/signin', bodyLogin)
+      console.log(response)
+  
+      if (response.status != 200) {
+        throw new Error('Credenciais inválidas. Tente novamente.');
+      }
+  
+      const data = await response.data;
+      const token = data.accessToken;
+      const user = jwtDecode(token);
+      console.log(user);
 
-    const admin = users.find(
-      user =>
-        user.nome.toLowerCase() === nomeUsuario.toLowerCase() &&
-        user.senha === senha &&
-        user.perfil === 'Administrador'
-    );
-
-    const author = users.find(
-      user =>
-        user.nome.toLowerCase() === nomeUsuario.toLowerCase() &&
-        user.senha === senha &&
-        user.perfil === 'Autor'
-    );
-
-    if (admin) {
-      localStorage.setItem('role', 'ADMIN');
-      localStorage.setItem('name', admin.nome);
-      window.location.href = '/admin';
-    } else if (collector) {
-      localStorage.setItem('role', 'COLLECTOR');
-      localStorage.setItem('name', collector.nome);
-      window.location.href = '/sticker-editor';
-    } else if (author) {
-      localStorage.setItem('role', 'AUTHOR');
-      localStorage.setItem('name', author.nome);
-      window.location.href = '/album-editor';
-    } else {
-      alert('Credenciais inválidas. Tente novamente.');
+      localStorage.setItem('role', user.role);
+      localStorage.setItem('username', user.username);
+      localStorage.setItem('id', user.id);
+  
+      if (user.role === 'ADMIN') {
+        localStorage.setItem('role', 'ADMIN');
+        localStorage.setItem('name', bodyLogin.username);
+        localStorage.setItem('token', token);
+        window.location.href = '/admin';
+      } else if (user.role === 'COLLECTOR') {
+        localStorage.setItem('role', 'COLLECTOR');
+        localStorage.setItem('name', bodyLogin.username);
+        localStorage.setItem('token', token);
+        window.location.href = '/album-view';
+      } else if (user.role === 'AUTHOR') {
+        localStorage.setItem('role', 'AUTHOR');
+        localStorage.setItem('name', bodyLogin.username);
+        localStorage.setItem('token', token);
+        window.location.href = '/album-editor';
+      } else {
+        alert('Credenciais inválidas. Tente novamente.');
+      }
+    } catch (error) {
+      alert(error.message);
     }
   };
+  
 
   const handleLogout = () => {
-    setNomeUsuario('');
-    setSenha('');
+    setUsername('');
+    setPassword('');
     localStorage.setItem('role', '');
     localStorage.setItem('name', '');
     console.log('Desconectado');
@@ -71,14 +73,14 @@ const Login = () => {
         <Input
           type="text"
           placeholder="Usuário"
-          value={nomeUsuario}
-          onChange={(e) => setNomeUsuario(e.target.value)}
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
         />
         <Input
           type="password"
           placeholder="Senha"
-          value={senha}
-          onChange={(e) => setSenha(e.target.value)}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           onSubmit={handleLogin}
         />
       </InputContainer>
@@ -90,7 +92,6 @@ const Login = () => {
   );
 };
 
-// Estilização dos componentes
 const Container = styled.div`
   display: flex;
   flex-direction: column;
